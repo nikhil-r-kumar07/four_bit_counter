@@ -1,28 +1,38 @@
 import cocotb
 from cocotb.clock import Clock
-from cocotb.triggers import RisingEdge
+from cocotb.triggers import RisingEdge, Timer
 
 @cocotb.test()
 async def test_reset(dut):
-    cocotb.start_soon(Clock(dut.clk, 10, units = "ns").start())
+    cocotb.start_soon(Clock(dut.clk, 10, units="ns").start())
+    dut.direction.value = 0
+    dut.load_enable.value = 0
+    dut.load.value = 0
     dut.areset.value = 1
     await RisingEdge(dut.clk)
+    await Timer(1, units="ns")
     assert dut.curr.value == 0, "Counter goes to 0"
 
 @cocotb.test()
 async def test_count_up(dut):
-    cocotb.start_soon(Clock(dut.clk, 10, units = "ns").start())
+    cocotb.start_soon(Clock(dut.clk, 10, units="ns").start())
     dut.direction.value = 1
+    dut.load_enable.value = 0
+    dut.load.value = 0
     dut.areset.value = 1
     await RisingEdge(dut.clk)
     dut.areset.value = 0
     for i in range(15):
         await RisingEdge(dut.clk)
+        await Timer(1, units="ns")
         assert dut.curr.value == (i + 1), "Counter counts up correctly"
 
 @cocotb.test()
 async def test_count_down(dut):
     cocotb.start_soon(Clock(dut.clk, 10, units="ns").start())
+    dut.direction.value = 0
+    dut.load_enable.value = 0
+    dut.load.value = 0
     dut.areset.value = 1
     await RisingEdge(dut.clk)
     dut.areset.value = 0
@@ -33,56 +43,72 @@ async def test_count_down(dut):
     dut.direction.value = 0
     for i in range(15):
         await RisingEdge(dut.clk)
+        await Timer(1, units="ns")
         assert dut.curr.value == (14 - i), "Counter counts down correctly"
 
 @cocotb.test()
 async def test_wrap_up(dut):
     cocotb.start_soon(Clock(dut.clk, 10, units="ns").start())
     dut.direction.value = 1
+    dut.load_enable.value = 0
+    dut.load.value = 0
     dut.areset.value = 1
     await RisingEdge(dut.clk)
     dut.areset.value = 0
     for i in range(16):
         await RisingEdge(dut.clk)
+    await Timer(1, units="ns")
     assert dut.curr.value == 0, "Counter wraps around from 15 to 0"
     assert dut.flowtype.value == 1, "Flowtype pulses correctly"
 
 @cocotb.test()
 async def test_wrap_down(dut):
-    cocotb.start_soon(Clock(dut.clk, 10, units = "ns").start())
+    cocotb.start_soon(Clock(dut.clk, 10, units="ns").start())
     dut.direction.value = 0
+    dut.load_enable.value = 0
+    dut.load.value = 0
     dut.areset.value = 1
     await RisingEdge(dut.clk)
     dut.areset.value = 0
     await RisingEdge(dut.clk)
+    await Timer(1, units="ns")
     assert dut.curr.value == 15, "Counter wraps around from 0 to 15 correctly"
     assert dut.flowtype.value == 1, "Flowtype pulses correctly"
 
 @cocotb.test()
 async def test_load(dut):
-    cocotb.start_soon(Clock(dut.clk, 10, units = "ns").start())
+    cocotb.start_soon(Clock(dut.clk, 10, units="ns").start())
+    dut.direction.value = 0
+    dut.load_enable.value = 0
     dut.load.value = 8
     dut.areset.value = 1
     await RisingEdge(dut.clk)
     dut.areset.value = 0
     dut.load_enable.value = 1
     await RisingEdge(dut.clk)
+    await Timer(1, units="ns")
     assert dut.curr.value == 8, "The load function works correctly"
 
 @cocotb.test()
 async def test_load_zero(dut):
-    cocotb.start_soon(Clock(dut.clk, 10, units = "ns").start())
+    cocotb.start_soon(Clock(dut.clk, 10, units="ns").start())
+    dut.direction.value = 0
+    dut.load_enable.value = 0
     dut.load.value = 0
     dut.areset.value = 1
     await RisingEdge(dut.clk)
     dut.areset.value = 0
     dut.load_enable.value = 1
     await RisingEdge(dut.clk)
+    await Timer(1, units="ns")
     assert dut.curr.value == 0, "The load zero function works correctly"
 
 @cocotb.test()
 async def test_reset_mid_sequence(dut):
-    cocotb.start_soon(Clock(dut.clk, 10, units = "ns").start())
+    cocotb.start_soon(Clock(dut.clk, 10, units="ns").start())
+    dut.direction.value = 0
+    dut.load_enable.value = 0
+    dut.load.value = 0
     dut.areset.value = 1
     await RisingEdge(dut.clk)
     dut.areset.value = 0
@@ -90,5 +116,5 @@ async def test_reset_mid_sequence(dut):
         await RisingEdge(dut.clk)
     dut.areset.value = 1
     await RisingEdge(dut.clk)
+    await Timer(1, units="ns")
     assert dut.curr.value == 0, "The sequence correctly resets to 0"
-
