@@ -1,9 +1,8 @@
 # 4-Bit Up/Down Counter
 
-A parameterizable 4-bit synchronous counter with bidirectional counting, 
+A parameterizable 4-bit synchronous counter with counting in both directions, 
 synchronous load, asynchronous reset, and a registered overflow/underflow 
-flag. Built as part of self-directed RTL learning alongside ECE 2020 at 
-Georgia Institute of Technology.
+flag.
 
 ## How It Works
 The counter increments or decrements on each clock edge based on the 
@@ -12,10 +11,10 @@ reaching 0, the counter wraps around and pulses the flowtype flag for
 one cycle on the next clock edge.
 
 ## Features
-- Bidirectional counting (up/down) controlled by direction input
+- Counting in both directions controlled by direction input
 - Synchronous load for setting arbitrary start value
 - Asynchronous reset
-- Registered overflow/underflow flag (flowtype) that pulses one cycle 
+- Registered overflow/underflow flag that pulses one cycle 
   after wraparound
 - Verified with 8-case self-checking cocotb testbench
 
